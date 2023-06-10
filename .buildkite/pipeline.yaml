@@ -1,0 +1,35 @@
+steps:
+  - label: "{{matrix}} build"
+    command:
+      - 'go env'
+      - 'go build ./...'
+      - 'go vet ./...'
+    env:
+      GOOS: 'linux'
+      GOARCH: '{{matrix}}'
+    plugins:
+      - docker#v5.7.0:
+          image: "ghcr.io/seankhliao/go:tip"
+          always-pull: true
+    matrix:
+      - "arm64"
+      - "amd64"
+  - label: "test"
+    command:
+      - 'go test ./...'
+    plugins:
+      - docker#v5.7.0:
+          image: "ghcr.io/seankhliao/go:tip"
+          always-pull: true
+  
+  - label: "deploy"
+    commands:
+      - "skaffold deploy"
+    plugins:
+      - docker#v5.7.0:
+          image: "ghcr.io/seankhliao/go:tip"
+          always-pull: true
+          command:
+            - 'skaffold deploy'
+          volumes:
+            - '/var/lib/buildkite-agent/kubeconfig:/root/.kube/config'
