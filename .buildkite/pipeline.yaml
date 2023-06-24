@@ -1,30 +1,29 @@
 steps:
-  - label: "{{matrix}} build"
+  - label: '{{matrix}} build'
     command:
       - 'go env'
       - 'go build ./...'
       - 'go vet ./...'
-    env:
-      GOOS: 'linux'
-      GOARCH: '{{matrix}}'
     plugins:
       - docker#v5.7.0:
-          image: "ghcr.io/seankhliao/go:tip"
+          image: 'ghcr.io/seankhliao/go:tip'
+          platform: 'linux/{{matrix}}'
           always-pull: true
     matrix:
       - "arm64"
       - "amd64"
-  - label: "test"
+
+  - label: 'test'
     command:
       - 'go test ./...'
     plugins:
       - docker#v5.7.0:
-          image: "ghcr.io/seankhliao/go:tip"
+          image: 'ghcr.io/seankhliao/go:tip'
           always-pull: true
   
-  - label: "deploy"
+  - label: 'deploy'
     commands:
-      - "skaffold deploy"
+      - 'skaffold deploy'
     plugins:
       - docker#v5.7.0:
           image: "ghcr.io/seankhliao/go:tip"
