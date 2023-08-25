@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
-  name: ihwa
+  name: ihwa-liao-dev
 spec:
   parentRefs:
     - name: default
@@ -14,5 +14,5 @@ spec:
           type: PathPrefix
           value: /
       backendRefs:
-        - name: ihwa
+        - name: ihwa-liao-dev
           port: 80

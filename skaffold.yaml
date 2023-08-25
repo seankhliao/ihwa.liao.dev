@@ -4,21 +4,45 @@ metadata:
   name: ihwa
 build:
   artifacts:
-    - image: ghcr.io/seankhliao/ihwa
+    - image: ghcr.io/seankhliao/ihwa-liao-dev
       ko:
         env:
           - CGO_ENABLED=0
+        flags:
+          - -trimpath
         ldflags:
           - -s
           - -w
+        dependencies:
+          paths:
+            - "go.mod"
+            - "**/*.go"
+            - "index.md"
   tagPolicy:
     inputDigest: {}
   platforms:
     - linux/amd64
     - linux/arm64
+deploy:
+  kubeContext: ihwa
+  kubectl:
+    defaultNamespace: ihwa-liao-dev
 manifests:
   kustomize:
+    buildArgs:
+      - --enable-alpha-plugins
+      - --enable-exec
     paths:
-      - manifests
-deploy:
-  kubectl: {}
+      - deploy/k8s/ihwa
+profiles:
+  - name: ihwa
+  - name: local
+    deploy:
+      kubeContext: kind-kind
+    manifests:
+      kustomize:
+        paths:
+          - deploy/k8s/kind
+    patches:
+      - path: /build/artifacts/0/image
+        value: ko.local/seankhliao/ihwa-liao-dev
