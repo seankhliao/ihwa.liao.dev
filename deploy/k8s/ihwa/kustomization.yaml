@@ -5,6 +5,31 @@ buildMetadata:
   - managedByLabel
   - originAnnotations
 
+patches:
+  - patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: ihwa-liao-dev
+      spec:
+        template:
+          spec:
+            containers:
+              - name: ihwa-liao-dev
+                env:
+                  - name: OTEL_SERVICE_NAME
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.labels['app.kubernetes.io/name']
+                  - name: POD_UID
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.uid
+                  - name: OTEL_RESOURCE_ATTRIBUTES
+                    value: k8s.pod.uid=$(POD_UID),k8s.cluster.name=ihwa,k8s.container.name=ihwa-liao-dev
+                  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+                    value: http://ingest.otelcol.svc:4317
+
 resources:
   - ../base
   - httproute.k8s.yaml
